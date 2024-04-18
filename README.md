@@ -10,5 +10,10 @@
 - MongoDb, Resend for mailing system
 - Encrption by bcryptjs
 
-New User Verification Flow:
+# Home Page Signup Logic:
+
+![alt text](image-1.png)
+
+# New User Verification Flow:
+
 ![alt text](image.png)
