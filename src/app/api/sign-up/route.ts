@@ -2,21 +2,20 @@ import { sendVerificationEmail } from "@/helpers/sendVerificationEmail";
 import dbConnect from "@/lib/dbConnect";
 import UserModel from "@/model/User.model";
 import bcryptjs from "bcryptjs";
-import { NextRequest } from "next/server";
 
-export async function POST(request: NextRequest) {
+export async function POST(request: Request) {
   await dbConnect();
 
   try {
     const { username, email, password } = await request.json();
 
-    const existingUserVerifiedbyUsername = await UserModel.findOne({
+    const existingVerifiedUserByUsername = await UserModel.findOne({
       username,
       isVerified: true,
     });
 
     // if full verified user exists, stop further
-    if (existingUserVerifiedbyUsername) {
+    if (existingVerifiedUserByUsername) {
       return Response.json(
         {
           success: false,
@@ -28,8 +27,7 @@ export async function POST(request: NextRequest) {
 
     // if user email exists but verification is not done until now
     const existingUserByEmail = await UserModel.findOne({ email });
-
-    const verifyCode = Math.floor(100000 + Math.random() * 900000).toString();
+    let verifyCode = Math.floor(100000 + Math.random() * 900000).toString();
 
     if (existingUserByEmail) {
       // Check if he is verified or not
@@ -61,7 +59,7 @@ export async function POST(request: NextRequest) {
         username,
         email,
         password: hashedPassword,
-        verifyCode: verifyCode,
+        verifyCode,
         verifyCodeExpiry: expiryDate,
         isVerified: false,
         isAcceptingMessage: true,
@@ -97,11 +95,11 @@ export async function POST(request: NextRequest) {
     );
   } catch (error) {
     console.error("Error registering the user", error);
-    return (
-      Response.json({
+    return Response.json(
+      {
         success: false,
         message: "Error registering the user",
-      }),
+      },
       {
         status: 500,
       }

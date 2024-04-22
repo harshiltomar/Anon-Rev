@@ -39,7 +39,7 @@ const UserSchema: Schema<UserSchemaProps> = new Schema({
     type: String,
     required: [true, "Email is required"],
     unique: true,
-    match: [/.+\@.\..+/, "Please use a Valid Email Address"],
+    match: [/^\S+@\S+\.\S+$/, "Please use a Valid Email Address"],
   },
   password: {
     type: String,

@@ -1,5 +1,4 @@
 import "next-auth";
-// 33.36
 
 declare module "next-auth" {
   interface User {
