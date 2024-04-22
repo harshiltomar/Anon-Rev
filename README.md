@@ -17,3 +17,17 @@
 # New User Verification Flow:
 
 ![alt text](image.png)
+
+# Verify Code Flow:
+
+![alt text](image-2.png)
+
+# Messages Structure
+
+- Idea: User can accept messages and status
+- API
+  - POST: status update
+  - GET: status of messages
+  - GET: all messages of current logged in user (Aggregation Pipelining)
+  - POST: send messages + save them
+- Use session info and session id for the same
