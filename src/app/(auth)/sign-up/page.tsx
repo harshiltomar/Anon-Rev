@@ -3,7 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import Link from "next/link";
-import { useDebounceCallback } from "usehooks-ts";
+import { useDebounceValue } from "usehooks-ts";
 import axios, { AxiosError } from "axios";
 import React, { useEffect, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
@@ -29,7 +29,7 @@ export default function SignInForm() {
   const [isCheckingUsername, setIsCheckingUsername] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const debounced = useDebounceCallback(setUsername, 500);
+  const debouncedUsername = useDebounceValue(username, 500);
   const { toast } = useToast();
   const router = useRouter();
 
@@ -45,13 +45,13 @@ export default function SignInForm() {
 
   useEffect(() => {
     const checkUsernameUnique = async () => {
-      if (username) {
+      if (debouncedUsername) {
         setIsCheckingUsername(true);
         setUsername("");
 
         try {
           const response = await axios.get(
-            `/api/check-username-unique?username=${username}`
+            `/api/check-username-unique?username=${debouncedUsername}`
           );
 
           setUsernameMessage(response.data.data);
@@ -67,7 +67,7 @@ export default function SignInForm() {
     };
 
     checkUsernameUnique();
-  }, [username]);
+  }, [debouncedUsername]);
 
   const onSubmit = async (data: z.infer<typeof signUpSchema>) => {
     setIsSubmitting(true);
@@ -90,7 +90,7 @@ export default function SignInForm() {
   };
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-800">
-      <div className="w-full max-w-d p-8 space-y-8 bg-white rounded-lg shadow-md">
+      <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md">
         <div className="text-center">
           <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl mb-6">
             Join Anon-Rev
@@ -111,21 +111,9 @@ export default function SignInForm() {
                       {...field}
                       onChange={(e) => {
                         field.onChange(e);
-                        debounced(e.target.value);
+                        setUsername(e.target.value);
                       }}
                     />
-                    {isCheckingUsername && <Loader className="animate-spin" />}
-                    {!isCheckingUsername && username && (
-                      <p
-                        className={`text-sm ${
-                          usernameMessage === "Username is unique"
-                            ? "text-green-500"
-                            : "text-red-500"
-                        }`}
-                      >
-                        {usernameMessage}
-                      </p>
-                    )}
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -153,12 +141,11 @@ export default function SignInForm() {
                   <FormControl>
                     <Input type="password" placeholder="password" {...field} />
                   </FormControl>
-                  {isCheckingUsername}
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <Button className="center" type="submit" disabled={isSubmitting}>
+            <Button type="submit" disabled={isSubmitting}>
               {isSubmitting ? (
                 <>
                   <Loader className="mr-2 h-4 w-4 animate-spin" /> Please Wait
