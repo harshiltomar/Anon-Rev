@@ -31,7 +31,7 @@ export async function GET(request: Request) {
           success: false,
           message:
             usernameErrors?.length > 0
-              ? usernameErrors.join(",")
+              ? usernameErrors.join(", ")
               : "Invalid query parameters",
         },
         { status: 400 }
@@ -49,7 +49,7 @@ export async function GET(request: Request) {
       return Response.json(
         {
           success: false,
-          message: "Invalid query parameters",
+          message: "Username is already taken",
         },
         { status: 400 }
       );
@@ -60,7 +60,7 @@ export async function GET(request: Request) {
         success: true,
         message: "Username is unique",
       },
-      { status: 400 }
+      { status: 200 }
     );
   } catch (error) {
     console.error("Error checking username", error);
